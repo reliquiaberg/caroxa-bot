@@ -17,6 +17,7 @@ const client = new Client({
 });
 
 const player = createAudioPlayer();
+let loopUrl = null;
 
 client.once('ready', () => {
   console.log('Bot ligado!');
@@ -41,13 +42,13 @@ client.on('messageCreate', async (message) => {
     message.reply('Entrei na call');
   }
 
-  // TOCAR MÚSICA
-  if (message.content.startsWith('!play')) {
+  // LOOP INFINITO
+  if (message.content.startsWith('!loop')) {
     const args = message.content.split(' ');
-    const url = args[1];
+    loopUrl = args[1];
 
-    if (!url) {
-      return message.reply('Coloque o link da música');
+    if (!loopUrl) {
+      return message.reply('Coloque o link do áudio');
     }
 
     if (!message.member.voice.channel) {
@@ -55,38 +56,33 @@ client.on('messageCreate', async (message) => {
     }
 
     playLoop(loopUrl);
-    message.reply('🔁 Loop infinito ativado');
+    message.reply('🔁 Loop infinito ativado (bem baixinho)');
+  }
+
+  // PARAR LOOP
+  if (message.content === '!stop') {
+    loopUrl = null;
+    player.stop();
+    message.reply('⏹️ Loop parado');
   }
 });
 
 async function playLoop(url) {
+  if (!url) return;
+
   const stream = await play.stream(url);
   const resource = createAudioResource(stream.stream, {
     inputType: stream.type,
     inlineVolume: true
   });
 
-  resource.volume.setVolume(0.01); // bem baixinho
+  resource.volume.setVolume(0.01); // volume baixíssimo
 
   player.play(resource);
 
   player.once(AudioPlayerStatus.Idle, () => {
-    playLoop(url); // toca de novo quando acabar
+    if (loopUrl) playLoop(loopUrl);
   });
 }
-
-    const stream = await play.stream(url);
-const resource = createAudioResource(stream.stream, {
-  inputType: stream.type,
-  inlineVolume: true
-});
-
-resource.volume.setVolume(0.01); // volume bem baixo (1%)
-
-
-    player.play(resource);
-    message.reply('🎶 Tocando música');
-  }
-});
 
 client.login(process.env.TOKEN);
