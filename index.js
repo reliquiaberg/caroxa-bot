@@ -55,9 +55,13 @@ client.on('messageCreate', async (message) => {
     }
 
     const stream = await play.stream(url);
-    const resource = createAudioResource(stream.stream, {
-      inputType: stream.type
-    });
+const resource = createAudioResource(stream.stream, {
+  inputType: stream.type,
+  inlineVolume: true
+});
+
+resource.volume.setVolume(0.01); // volume bem baixo (1%)
+
 
     player.play(resource);
     message.reply('🎶 Tocando música');
