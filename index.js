@@ -54,6 +54,27 @@ client.on('messageCreate', async (message) => {
       return message.reply('Entre em uma call primeiro');
     }
 
+    playLoop(loopUrl);
+    message.reply('🔁 Loop infinito ativado');
+  }
+});
+
+async function playLoop(url) {
+  const stream = await play.stream(url);
+  const resource = createAudioResource(stream.stream, {
+    inputType: stream.type,
+    inlineVolume: true
+  });
+
+  resource.volume.setVolume(0.01); // bem baixinho
+
+  player.play(resource);
+
+  player.once(AudioPlayerStatus.Idle, () => {
+    playLoop(url); // toca de novo quando acabar
+  });
+}
+
     const stream = await play.stream(url);
 const resource = createAudioResource(stream.stream, {
   inputType: stream.type,
