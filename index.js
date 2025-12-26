@@ -32,5 +32,5 @@ client.on('messageCreate', (message) => {
     message.reply('Entrei na call');
   }
 });
-
+console.log("TOKEN EXISTE?", !!process.env.TOKEN);
 client.login(process.env.TOKEN);
